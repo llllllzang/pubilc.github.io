@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新春快乐 - 多页面切换</title>
+    <style>
+        /* ==================== 春节主题全局基础样式（可更改） ==================== */
+        :root {
+            /* 背景颜色 - 主背景（可更改：调整红色深度） */
+            --bg-primary: #010000;
+            /* 背景颜色 - 次背景，带暖红调（可更改：调整红色成分） */
+            --bg-secondary: #c21111;
+            /* 强调色 - 春节金色（可更改：品牌金色） */
+            --accent-gold: #fbbf24;
+            /* 强调色 - 亮金色，用于悬停和高亮（可更改） */
+            --accent-gold-light: #fcd34d;
+            /* 强调色 - 深金色，用于光晕（可更改） */
+            --accent-gold-glow: rgba(251, 191, 36, 0.5);
+            /* 强调色 - 更淡的光晕（可更改） */
+            --accent-gold-glow-soft: rgba(251, 191, 36, 0.25);
+            /* 强调色 - 春节红（可更改） */
+            --accent-red: #dc2626;
+            /* 强调色 - 亮红（可更改） */
+            --accent-red-light: #ef4444;
+            /* 文字颜色 - 主文字（可更改） */
+            --text-primary: #fef3c7;
+            /* 文字颜色 - 次要文字（可更改） */
+            --text-secondary: #fde68a;
+            /* 文字颜色 - 标题（可更改） */
+            --text-heading: #fef9c3;
+            /* 导航按钮文字颜色（可更改） */
+            --nav-text: #fed7aa;
+            /* 导航按钮悬停文字颜色（可更改） */
+            --nav-text-hover: #ffffff;
+            /* 下载按钮文字颜色（可更改） */
+            --download-btn-text: #7c2d12;
+            /* 下载按钮背景渐变色1（可更改） */
+            --download-btn-bg1: #fbbf24;
+            /* 下载按钮背景渐变色2（可更改） */
+            --download-btn-bg2: #f59e0b;
+            /* 下载按钮悬停背景渐变色1（可更改） */
+            --download-btn-hover-bg1: #fcd34d;
+            /* 下载按钮悬停背景渐变色2（可更改） */
+            --download-btn-hover-bg2: #fbbf24;
+            /* 卡片/容器背景色（可更改） */
+            --card-bg: rgba(120, 30, 30, 0.4);
+            /* 卡片边框颜色（可更改） */
+            --card-border: rgba(251, 191, 36, 0.3);
+            /* 导航条背景色（可更改） */
+            --nav-bg: rgba(80, 20, 20, 0.85);
+            /* 导航条边框颜色（可更改） */
+            --nav-border: rgba(251, 191, 36, 0.25);
+            /* 页面内容区背景（可更改） */
+            --page-bg: rgba(120, 30, 30, 0.25);
+            /* 页面内容区边框（可更改） */
+            --page-border: rgba(251, 191, 36, 0.3);
+        }
+
+        /* ==================== 基础重置 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ==================== 页面主体（春节红黑渐变背景，可更改） ==================== */
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Serif SC', 'KaiTi', '楷体', 'Helvetica Neue', sans-serif;
+            /* 背景：深红色为主，从底部透出金色调（可更改渐变角度和颜色值） */
+            background: radial-gradient(ellipse at 50% 120%, #7c2d12 0%, #3b0a0a 55%, #1a0505 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            /* 添加春节氛围纹理（可更改或删除） */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M20 20 L30 20 L25 10 Z" fill="rgba(251,191,36,0.08)"/><circle cx="70" cy="30" r="5" fill="rgba(251,191,36,0.06)"/><circle cx="85" cy="70" r="8" fill="rgba(220,38,38,0.1)"/></svg>');
+            background-size: 200px 200px;
+        }
+
+        /* ==================== 背景装饰光斑（春节红金色光晕，可更改位置、大小、颜色） ==================== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.18) 0%, rgba(220, 38, 38, 0.08) 40%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: bgGlowPulse 7s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            right: -8%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, rgba(251, 191, 36, 0.06) 45%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: bgGlowPulse2 9s ease-in-out infinite;
+        }
+
+        @keyframes bgGlowPulse {
+            0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+        }
+
+        @keyframes bgGlowPulse2 {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.15); }
+        }
+
+        /* ==================== 主内容容器（可更改：最大宽度） ==================== */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ==================== 顶部导航栏（春节样式：红底金边，可更改） ==================== */
+        .navbar {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--nav-border);
+            border-radius: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(251, 191, 36, 0.15) inset;
+            position: relative;
+            z-index: 10;
+            animation: navSlideDown 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        @keyframes navSlideDown {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== 导航按钮样式（金色文字，红色激活，可更改） ==================== */
+        .nav-btn {
+            position: relative;
+            padding: 10px 22px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--nav-text);
+            background: transparent;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 100%;
+            background: rgba(220, 38, 38, 0.3);
+            border-radius: 30px;
+            transform: translate(-50%, -50%);
+            transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            z-index: -1;
+        }
+
+        .nav-btn:hover {
+            color: var(--nav-text-hover);
+            transform: translateY(-2px);
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+        }
+
+        .nav-btn:hover::before { width: 100%; }
+
+        .nav-btn:active {
+            transform: translateY(0px) scale(0.96);
+            transition: all 0.1s ease;
+        }
+
+        .nav-btn.active {
+            color: #ffffff;
+            background: rgba(220, 38, 38, 0.6);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+            font-weight: 600;
+        }
+
+        .nav-btn.active::before {
+            width: 100%;
+            background: rgba(220, 38, 38, 0.6);
+        }
+
+        /* ==================== 页面内容容器（春节卡片样式，可更改） ==================== */
+        .page-content {
+            width: 100%;
+            margin-top: 40px;
+            padding: 40px 30px;
+            background: var(--page-bg);
+            border: 1px solid var(--page-border);
+            border-radius: 32px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(251, 191, 36, 0.15);
+            display: none;
+            animation: pageFadeIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+
+        .page-content.active-page { display: block; }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-content h2 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5));
+            text-align: center;
+        }
+
+        .page-content p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .placeholder-card {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            border-radius: 20px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .placeholder-card:hover {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: rgba(251, 191, 36, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .placeholder-card h3 {
+            font-size: 20px;
+            color: var(--text-heading);
+            margin-bottom: 8px;
+        }
+
+        .placeholder-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            max-width: 100%;
+            text-align: left;
+        }
+
+        /* ==================== 下载页面（按钮1）的英雄区域 ==================== */
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* 春节标题样式（大字+福字装饰，可更改） */
+        .hero-title {
+            font-size: 58px;
+            font-weight: 700;
+            color: var(--text-heading);
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+            position: relative;
+            background: linear-gradient(180deg, #fef9c3 0%, #fbbf24 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.6));
+            animation: titleFloat 4s ease-in-out infinite;
+            /* 标题两侧加上装饰性福字（可更改或删除） */
+            display: inline-block;
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* 标题旁边的春联装饰（可选，可更改） */
+        .hero-title::before {
+            content: '🧧';
+            font-size: 0.7em;
+            margin-right: 10px;
+            filter: none;
+            -webkit-text-fill-color: initial;
+            background: none;
+            display: inline-block;
+            vertical-align: middle;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .hero-title::after {
+            content: '🧧';
+            font-size: 0.7em;
+            margin-left: 10px;
+            filter: none;
+            -webkit-text-fill-color: initial;
+            background: none;
+            display: inline-block;
+            vertical-align: middle;
+            animation: floatIcon 3s ease-in-out 0.5s infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        /* 副标题文字（可更改） */
+        .hero-subtitle {
+            font-size: 18px;
+            color: #fde68a;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+            max-width: 500px;
+            line-height: 1.6;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        }
+
+        /* ==================== 下载按钮容器（春节红金风格） ==================== */
+        .download-btn-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 外层光晕（金色） */
+        .download-btn-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 110%;
+            height: 110%;
+            border-radius: 60px;
+            background: transparent;
+            border: 2px solid rgba(251, 191, 36, 0.6);
+            animation: glowRingPulse 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes glowRingPulse {
+            0%, 100% {
+                width: 105%; height: 105%; opacity: 0.6;
+                border-color: rgba(251, 191, 36, 0.6);
+            }
+            50% {
+                width: 125%; height: 125%; opacity: 0;
+                border-color: rgba(251, 191, 36, 0.9);
+            }
+        }
+
+        .download-btn-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 105%;
+            height: 105%;
+            border-radius: 60px;
+            background: transparent;
+            border: 2px solid rgba(220, 38, 38, 0.5);
+            animation: glowRingPulse 2s ease-in-out 0.6s infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 下载按钮主体（金色渐变背景，红色文字） */
+        .download-btn {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 52px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--download-btn-text);
+            background: linear-gradient(135deg, var(--download-btn-bg1) 0%, var(--download-btn-bg2) 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 28px rgba(180, 83, 9, 0.5), 0 0 60px rgba(251, 191, 36, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+            overflow: hidden;
+            animation: btnBreathe 3s ease-in-out infinite;
+        }
+
+        @keyframes btnBreathe {
+            0%, 100% { box-shadow: 0 8px 28px rgba(180, 83, 9, 0.5), 0 0 60px rgba(251, 191, 36, 0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+            50% { box-shadow: 0 10px 34px rgba(180, 83, 9, 0.7), 0 0 80px rgba(251, 191, 36, 0.6), inset 0 1px 0 rgba(255,255,255,0.4); }
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.25) 70%, transparent);
+            transform: skewX(-25deg);
+            transition: left 0.6s ease;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .download-btn:hover::before { left: 120%; }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, var(--download-btn-hover-bg1) 0%, var(--download-btn-hover-bg2) 100%);
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 16px 40px rgba(180, 83, 9, 0.65), 0 0 90px rgba(251, 191, 36, 0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+        }
+
+        .download-btn:active {
+            transform: translateY(-1px) scale(0.97);
+            box-shadow: 0 5px 15px rgba(180, 83, 9, 0.6), 0 0 40px rgba(251, 191, 36, 0.5);
+            transition: all 0.1s ease;
+        }
+
+        .download-icon {
+            width: 22px;
+            height: 22px;
+            color: #7c2d12;
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+        }
+
+        .download-btn:hover .download-icon { transform: translateY(3px); }
+
+        /* ==================== 粒子改为金色小点（春节氛围） ==================== */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(251, 191, 36, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(30px) scale(1.2); opacity: 0; }
+        }
+
+        /* ==================== 响应式设计 - 移动端适配 ==================== */
+        @media (max-width: 768px) {
+            .navbar {
+                gap: 4px;
+                padding: 10px 12px;
+                border-radius: 40px;
+                margin-top: 16px;
+            }
+
+            .nav-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+                border-radius: 25px;
+            }
+
+            .nav-btn::before { border-radius: 25px; }
+
+            .page-content {
+                margin-top: 24px;
+                padding: 28px 18px;
+                border-radius: 24px;
+            }
+
+            .page-content h2 { font-size: 28px; }
+
+            .hero-title {
+                font-size: 38px;
+            }
+
+            .hero-title::before,
+            .hero-title::after {
+                font-size: 0.6em;
+            }
+
+            .hero-subtitle {
+                font-size: 15px;
+                margin-bottom: 45px;
+                padding: 0 16px;
+            }
+
+            .download-btn {
+                padding: 14px 38px;
+                font-size: 17px;
+                letter-spacing: 2px;
+            }
+
+            .download-btn-wrapper::before,
+            .download-btn-wrapper::after { border-radius: 45px; }
+
+            body::before { width: 400px; height: 400px; top: -15%; }
+            body::after { width: 300px; height: 300px; bottom: -10%; right: -10%; }
+        }
+
+        @media (max-width: 400px) {
+            .nav-btn { padding: 7px 10px; font-size: 12px; }
+            .hero-title { font-size: 30px; }
+            .page-content h2 { font-size: 24px; }
+            .download-btn { padding: 12px 28px; font-size: 15px; letter-spacing: 1.5px; }
+            .navbar { gap: 2px; padding: 8px 8px; border-radius: 30px; }
+            .page-content { padding: 20px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <div class="main-container">
+        <!-- 导航栏（保持不变，文字可按需修改） -->
+        <nav class="navbar" aria-label="主导航">
+            <button class="nav-btn active" data-nav="1" aria-current="page">🧧 首页</button>
+            <button class="nav-btn" data-nav="2">🏮 活动</button>
+            <button class="nav-btn" data-nav="3">🧨 祝福</button>
+            <button class="nav-btn" data-nav="4">🎆 关于</button>
+        </nav>
+
+        <!-- 页面1：下载页面 -->
+        <section class="page-content active-page" id="page1" aria-label="新春下载">
+            <div class="hero-section">
+                <h1 class="hero-title">新春快乐</h1>
+                <p class="hero-subtitle">🐉 龙年大吉 · 福气满满 · 一键下载新春贺礼 🧧</p>
+                <div class="download-btn-wrapper">
+                    <button class="download-btn" id="downloadBtn" aria-label="立即下载新春礼包" title="点击下载新春祝福">
+                        <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="4" x2="12" y2="18"></line>
+                            <polyline points="8 14 12 18 16 14"></polyline>
+                            <line x1="4" y1="22" x2="20" y2="22"></line>
+                        </svg>
+                        立即下载
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页面2：活动介绍 -->
+        <section class="page-content" id="page2" aria-label="新春活动">
+            <h2>🏮 新春活动</h2>
+            <p>春节期间精彩活动不停歇，参与即有惊喜好礼相送！</p>
+            <div class="placeholder-card">
+                <h3>🧨 红包雨</h3>
+                <p>每日整点红包雨，拼手速赢取现金红包与优惠券。</p>
+            </div>
+            <div class="placeholder-card">
+                <h3>🐲 舞龙表演</h3>
+                <p>线上直播舞龙盛会，感受传统年味，互动还能抽大奖。</p>
+            </div>
+        </section>
+
+        <!-- 页面3：祝福留言 -->
+        <section class="page-content" id="page3" aria-label="新春祝福">
+            <h2>🧧 新春祝福</h2>
+            <p>写下您的祝福，传递温暖与好运。</p>
+            <div class="placeholder-card">
+                <h3>✍️ 热门祝福</h3>
+                <p>“龙行龘龘，前程朤朤。愿您在新的一年里如龙腾飞，事业蒸蒸日上！”</p>
+            </div>
+            <div class="placeholder-card">
+                <h3>💌 发给好友</h3>
+                <p>选择一张精美新春贺卡，发送给亲朋好友，表达真挚情意。</p>
+            </div>
+        </section>
+
+        <!-- 页面4：关于我们 -->
+        <section class="page-content" id="page4" aria-label="关于本站">
+            <h2>🎆 关于本站</h2>
+            <p>我们致力于用科技传承年味，让每一个春节都充满温暖记忆。</p>
+            <div class="placeholder-card">
+                <h3>📜 我们的故事</h3>
+                <p>从传统民俗中汲取灵感，结合数字创意，打造线上春节体验。</p>
+            </div>
+            <div class="placeholder-card">
+                <h3>📞 联系方式</h3>
+                <p>邮箱：chunjie@example.com<br>电话：+86 400-888-8888</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        (function() {
+            // 粒子配置（金色粒子，数量可更改）
+            const PARTICLE_COUNT = 40;
+            const particlesContainer = document.getElementById('particlesContainer');
+
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const leftPos = Math.random() * 100;
+                const size = 2 + Math.random() * 4;
+                const duration = 8 + Math.random() * 15;
+                const delay = Math.random() * 18;
+                particle.style.left = leftPos + '%';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.animationDuration = duration + 's';
+                particle.style.animationDelay = -delay + 's';
+                particle.style.opacity = 0.4 + Math.random() * 0.5;
+                return particle;
+            }
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particlesContainer.appendChild(createParticle());
+            }
+
+            // 页面切换逻辑
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const pageContents = document.querySelectorAll('.page-content');
+
+            function switchPage(pageId) {
+                pageContents.forEach(page => page.classList.remove('active-page'));
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active-page');
+                    targetPage.style.animation = 'none';
+                    targetPage.offsetHeight;
+                    targetPage.style.animation = '';
+                }
+            }
+
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const navId = this.getAttribute('data-nav');
+                    switchPage('page' + navId);
+                });
+
+                btn.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+
+            // 下载按钮（方案二：跳转链接，请替换为您的真实下载地址）
+            const DOWNLOAD_URL = 'https://example.com/chunjie-gift.zip';  // 可更改
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function(e) {
+                    this.style.transform = 'scale(0.92)';
+                    this.style.transition = 'transform 0.15s';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        this.style.transition = 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+                    }, 150);
+                    setTimeout(() => {
+                        window.location.href = DOWNLOAD_URL;
+                    }, 200);
+                });
+            }
+
+            // 键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                const keyNum = parseInt(e.key);
+                if (keyNum >= 1 && keyNum <= 4 && !e.ctrlKey && !e.metaKey && document.activeElement === document.body) {
+                    navButtons.forEach(b => b.classList.remove('active'));
+                    const targetBtn = document.querySelector(`.nav-btn[data-nav="${keyNum}"]`);
+                    if (targetBtn) {
+                        targetBtn.classList.add('active');
+                        switchPage('page' + keyNum);
+                    }
+                }
+                if (e.key === 'd' && !e.ctrlKey && !e.metaKey && document.activeElement === document.body) {
+                    const page1 = document.getElementById('page1');
+                    if (page1 && page1.classList.contains('active-page')) {
+                        e.preventDefault();
+                        if (downloadBtn) downloadBtn.click();
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
